@@ -8,6 +8,7 @@ It's only sketch!
 ###Installation
  * Unpack to `protected/extensions`
  * Add the following to your config file 'components' section:
+
 ~~~php
 <?php
 // ...
@@ -27,7 +28,10 @@ It's only sketch!
  * Use $this->getTokenByCode() to obtain access_token. If your application only grab data, access_token will not expire.
 
 Somewhere in cli command:
+
+
 ~~~php
+<?php
 class TestCommand extends CConsoleCommand
 {
 
@@ -37,6 +41,5 @@ class TestCommand extends CConsoleCommand
 
 }
 ~~~
-
 Will add documentation soon.
 
