@@ -71,8 +71,11 @@ class YandexApiBase
 
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_CAPATH => dirname(__FILE__) . '/cert',
-            CURLOPT_CAINFO => dirname(__FILE__) . '/cert/solid-cert.crt',
+
+            // Download cacert.pem from http://curl.haxx.se/docs/caextract.html
+            // (Automatically converted CA Certs from mozilla.org) 
+            CURLOPT_CAINFO => dirname(__FILE__) . '/cacert.pem',
+            
         );
 
         switch (strtoupper($method)) {
