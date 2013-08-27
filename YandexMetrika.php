@@ -73,4 +73,39 @@ class YandexMetrika extends YandexApiBase
 
     }
 
+
+    /**
+     * Отчет Поисковые системы
+     *
+     * GET /stat/sources/search_engines
+     * @param int $id Идентификатор счетчика (*)
+     * @param int $goalId Идентификатор цели счетчика для получения целевого отчета.
+     * @param string $dateFrom Дата начала периода выборки в формате YYYYMMDD
+     * @param string $dateTo Дата окончания периода выборки в формате YYYYMMDD
+     * @param string $tableMode tree ― дерево; plain ― список (используется по умолчанию).
+     * @param int $perPage Количество элементов на странице выдачи. По умолчанию выводится 100 записей.
+     * @param string $sort Поле данных отчета, по которому необходимо отсортировать результаты запроса.
+     *   Значение по умолчанию: visits — результаты запроса сортируются по количеству визитов.
+     * @param int $reverse Режим сортировки данных. Возможные значения: 
+     *   1 ― по убыванию (используется по умолчанию); 
+     *   0 ― по возрастанию.
+     * @link http://api.yandex.ru/metrika/doc/ref/stat/sources-search-engines.xml
+     */
+    public function statSearchEngines($id, $goalId = null, $dateFrom = null, $dateTo = null, $tableMode = "tree", $sort = "visits", $reverse = 1, $perPage = 100)
+    {
+        $options = array(
+            'id'=>$id,);
+
+        !is_null($goalId) ? $options["goal_id"] = $goalId : false;
+        !is_null($dateFrom) ? $options["date1"] = date("Ymd", $dateFrom) : false;
+        !is_null($dateTo) ? $options["date2"] = date("Ymd", $dateTo) : false;
+        !is_null($tableMode) ? $options["table_mode"] = $tableMode : false;
+        !is_null($sort) ? $options["sort"] = $sort : false;
+        !is_null($reverse) ? $options["reverse"] = $reverse : false;
+        !is_null($perPage) ? $options["per_page"] = $perPage : false;
+
+        return $this->request('GET', self::$service . '/stat/sources/search_engines.json', $options);
+    }
+
+
 }
