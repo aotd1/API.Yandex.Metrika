@@ -1,8 +1,7 @@
 <?php
-/**
- * Yandex.Metrika API wrapper.
- */
-class YandexMetrika extends YandexApiBase
+namespace Yandex;
+
+class Metrika extends ApiBase
 {
     protected static $service = 'https://api-metrika.yandex.ru';
 

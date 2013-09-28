@@ -1,31 +1,33 @@
 <?php
-
+namespace Yandex;
+use Yandex;
 
 /**
  * Yandex API wrapper.
  * - First of all you need to register new console application @link https://oauth.yandex.ru/client/new
  *   with redirect_url https://oauth.yandex.ru/verification_code
- * - Next - take <access_code>:
+ * - Next - take <access_token>:
  *   https://oauth.yandex.ru/authorize?response_type=code&client_id=<client_id>
  * - Use $this->getTokenByCode() to obtain access_token
  */
-class YandexApiBase
+class ApiBase
 {
     private $client_id;
     private $client_secret;
 
     public $access_token;
+    public static $certificate_path = __DIR__;
 
-    public function __construct($token, $id = null, $secret = null)
+    public function __construct($client_id = null, $client_secret = null)
     {
-        $this->client_id = $id;
-        $this->client_secret = $secret;
-        $this->access_token = $token;
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
     }
 
     /**
      * @param string $code
-     * @throws YandexApiException on fail
+     * @throws ApiException on fail
+     * @return array
      */
     public function getTokenByCode($code)
     {
@@ -36,12 +38,12 @@ class YandexApiBase
             'client_secret' => $this->client_secret,
         ));
         if (!$data)
-            throw new YandexApiException("Can't take access_token by application code");
-        $data = json_decode($data);
+            throw new ApiException("Can't take access_token by application code");
+        $data = json_decode($data, true);
         if (isset($data['error']))
-            throw new YandexApiException("Shit happens: {$data['error']}");
+            throw new ApiException("Something went wrong: {$data['error']}");
         if (!isset($data['access_token']))
-            throw new YandexApiException("No errors, but token not send: " . CVarDumper::dumpAsString($data));
+            throw new ApiException("No errors, but token not send: " . print_r($data, true));
         return $data;
 
     }
@@ -54,9 +56,11 @@ class YandexApiBase
 
     /**
      * Send request with token
-     * @param $url
-     * @param array $options
      * @param string $method
+     * @param string $url
+     * @param array $options
+     * @throws ApiException
+     * @return mixed
      */
     protected static function rawRequest($method = 'GET', $url, $options = array())
     {
@@ -74,13 +78,12 @@ class YandexApiBase
 
             // Download cacert.pem from http://curl.haxx.se/docs/caextract.html
             // (Automatically converted CA Certs from mozilla.org) 
-            CURLOPT_CAINFO => dirname(__FILE__) . '/cacert.pem',
+            CURLOPT_CAINFO => self::$certificate_path . '/cacert.pem',
             
         );
 
         switch (strtoupper($method)) {
-            case 'DELETE':
-                $curlOpt[CURLOPT_CUSTOMREQUEST] = "DELETE";
+            case 'DELETE': $curlOpt[CURLOPT_CUSTOMREQUEST] = "DELETE";
             case 'GET':
                 if (!empty($options))
                     $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query($options);
@@ -89,7 +92,7 @@ class YandexApiBase
                 $body = http_build_query($options);
                 $fp = fopen('php://temp/maxmemory:256000', 'w');
                 if (!$fp)
-                    throw new YandexApiException('Could not open temp memory data');
+                    throw new ApiException('Could not open temp memory data');
                 fwrite($fp, $body);
                 fseek($fp, 0);
                 $curlOpt[CURLOPT_PUT] = 1;
@@ -103,7 +106,7 @@ class YandexApiBase
                 $curlOpt[CURLOPT_POSTFIELDS] = http_build_query($options);
                 break;
             default:
-                throw new YandexApiException("Unsupported request method '$method'");
+                throw new ApiException("Unsupported request method '$method'");
         }
 
         $curl = curl_init($url);
@@ -116,12 +119,9 @@ class YandexApiBase
         } else {
             $err_msg = curl_error($curl);
             curl_close($curl);
-            throw new YandexApiException($err_msg, $err_no);
+            throw new ApiException($err_msg, $err_no);
         }
     }
 
 }
 
-class YandexApiException extends Exception
-{
-}

@@ -1,8 +1,7 @@
 <?php
-/**
- * User: aotd (work@aotd.ru)
- */
-class YandexApiYii extends CApplicationComponent
+namespace Yandex;
+
+class ApiYii extends \CApplicationComponent
 {
     public $client_id;
     public $client_secret;
@@ -14,12 +13,13 @@ class YandexApiYii extends CApplicationComponent
     public function init()
     {
         parent::init();
-        if (Yii::getPathOfAlias('YandexApi') === false)
-            Yii::setPathOfAlias('YandexApi', realpath(dirname(__FILE__)));
+        if (Yii::getPathOfAlias('Yandex') === false) {
+            Yii::setPathOfAlias('Yandex', realpath(dirname(__FILE__)));
+        }
 
-        Yii::import('YandexApi.YandexApiBase', true);
-        $class = 'Yandex' . ucfirst($this->service);
-        Yii::import('YandexApi.' . $class, true);
+        Yii::import('Yandex.ApiBase', true);
+        $class = '\Yandex\\' . ucfirst($this->service);
+        Yii::import('Yandex.' . $class, true);
         $this->_service = new $class($this->access_token, $this->client_id, $this->client_secret);
     }
 
