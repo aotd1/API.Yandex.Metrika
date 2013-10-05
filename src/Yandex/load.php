@@ -8,4 +8,4 @@ if (!function_exists('json_decode')) {
 
 require 'ApiException.php';
 require 'ApiBase.php';
-require 'YandexMetrika.php';
+require 'Metrika.php';

@@ -1,59 +1,90 @@
-<?php
-namespace Yandex;
+<?php namespace Yandex;
 
 class Metrika extends ApiBase
 {
     protected static $service = 'https://api-metrika.yandex.ru';
 
+    public static $dictType = array('simple', 'partner');
+    public static $dictPermission = array('own', 'view', 'edit');
+    public static $dictField = array('mirrors', 'goals', 'filters', 'operations', 'grants');
+    public static $dictGroup = array('day', 'week', 'month');
+
     /**
      * Список доступных счетчиков
      * GET /counters
      * @param string $type - simple, partner
-     * @param string $permission - ownn, view, edit
+     * @param string $permission - own, view, edit
      * @param string $ulogin
      * @param array $field - array of mirrors, goals, filters, operations, grants
-     * @return mixed
-     * @throws YandexApiException
+     * @return array
+     * @throws ApiException
      * @link http://api.yandex.ru/metrika/doc/ref/reference/get-counter-list.xml
      */
     public function getCounters($type = null, $permission = null, $ulogin = null, array $field = array())
     {
-        if (!empty($type) && !in_array($type, array('simple', 'partner')))
-            throw new YandexApiException("Unsupported type value: '$type'");
-        else
-            $options['type'] = $type;
+        $options['type'] = self::checkDictionary($type, 'type');
+        $options['permission'] = self::checkDictionary($permission, 'permission');
 
-        if (!empty($permission) && !in_array($permission, array('own', 'view', 'edit')))
-            throw new YandexApiException("Unsupported permission value: '$permission'");
-        else
-            $options['permission'] = $permission;
-
-        if (!empty($ulogin))
+        if (!empty($ulogin)) {
             $options['ulogin'] = $ulogin;
+        }
 
         if (!empty($field)) {
-            foreach ($field as $item)
-                if (!in_array($item, array('mirrors', 'goals', 'filters', 'operations', 'grants')))
-                    throw new YandexApiException("Unsupported field value: '$item'");
+            foreach ($field as $item) {
+                self::checkDictionary($item, 'field');
+            }
             $options['field'] = implode(',', $field);
         }
-        return $this->request('GET', self::$service . '/counters.json', $options);
+
+        $result = $this->request('GET', '/counters.json', $options);
+        if (isset($result['counters'])) {
+            return $result['counters'];
+        } else {
+            return null;
+        }
     }
 
     /**
-     * POST /counters
+     * Возвращает информацию об указанном счетчике.
+     * GET /counter/{id}
+     * @param int $id
+     * @param array $field additional fields
+     * @return array|null
+     * @throws ApiException
+     * @link http://api.yandex.ru/metrika/doc/ref/reference/get-counter.xml
      */
-    public function addCounter($params)
+    public function getCounter($id, array $field = array())
     {
+        $options = array();
+        if (!empty($field)) {
+            foreach ($field as $item)
+                self::checkDictionary($item, 'field');
+            $options['field'] = implode(',', $field);
+        }
 
+        $result = $this->request('GET', "/counter/$id.json", $options);
+        if (isset($result['counter'])) {
+            return $result['counter'];
+        } else {
+            return null;
+        }
     }
 
     /**
-     * DELETE /counter/{id}
+     * GET /counter/{id}/check
+     * @param int $id
+     * @return array
+     * @throws ApiException
+     * @link http://api.yandex.ru/metrika/doc/ref/reference/check-counter.xml
      */
-    public function deleteCounter($id)
+    public function checkCounter($id)
     {
-
+        $result = $this->request('GET', "/counter/$id/check.json");
+        if (isset($result['counter'])) {
+            return $result['counter'];
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -61,15 +92,25 @@ class Metrika extends ApiBase
      * GET /stat/traffic/summary
      * @param int $id
      * @param int $goalId
-     * @param timestamp $dateFrom
-     * @param timestamp $dateTo
+     * @param datetime|string $dateFrom
+     * @param datetime|string $dateTo
      * @param string $group - day, week, month
      * @param int $perPage
+     * @return array|null
      * @link http://api.yandex.ru/metrika/doc/ref/stat/traffic-summary.xml
      */
     public function statTrafficSummary($id, $goalId = null, $dateFrom = null, $dateTo = null, $group = null, $perPage = 100)
     {
+        $options = array('id'=>$id, 'per_page'=>$perPage);
+        if ($goalId !== null)
+            $options['goal_id'] = $goalId;
+        if ($dateFrom)
+            $options['date1'] = self::formatDate($dateFrom);
+        if ($dateTo)
+            $options['date2'] = self::formatDate($dateTo);
+        $options['group'] = $this->checkDictionary($group, 'group');
 
+        return $this->request('GET', '/stat/traffic/summary.json', $options);
     }
 
 

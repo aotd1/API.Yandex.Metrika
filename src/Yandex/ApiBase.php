@@ -1,6 +1,4 @@
-<?php
-namespace Yandex;
-use Yandex;
+<?php namespace Yandex;
 
 /**
  * Yandex API wrapper.
@@ -15,13 +13,16 @@ class ApiBase
     private $client_id;
     private $client_secret;
 
+    protected static $service = 'https://api.yandex.ru';
+
     public $access_token;
     public static $certificate_path = __DIR__;
 
-    public function __construct($client_id = null, $client_secret = null)
+    public function __construct($client_id = null, $client_secret = null, $access_token = null)
     {
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
+        $this->access_token = $access_token;
     }
 
     /**
@@ -45,13 +46,12 @@ class ApiBase
         if (!isset($data['access_token']))
             throw new ApiException("No errors, but token not send: " . print_r($data, true));
         return $data;
-
     }
 
     protected function request($method = 'GET', $url, $options = array())
     {
         $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query(array('oauth_token' => $this->access_token));
-        return json_decode(self::rawRequest($method, $url, $options), true);
+        return json_decode(self::rawRequest($method, static::$service . $url, $options), true);
     }
 
     /**
@@ -121,6 +121,34 @@ class ApiBase
             curl_close($curl);
             throw new ApiException($err_msg, $err_no);
         }
+    }
+
+    /**
+     * @param $value
+     * @param $dictionaryName
+     * @return mixed
+     * @throws ApiException
+     */
+    protected static function checkDictionary($value, $dictionaryName)
+    {
+        $dictionaryName = ucfirst($dictionaryName);
+        if (empty(static::${'dict'.$dictionaryName}))
+            throw new ApiException("Unsupported dictionary: '$dictionaryName'. You must specify `public static \$dict$dictionaryName` array");
+        if (!empty($value) && !in_array($value, static::${'dict'.$dictionaryName}))
+            throw new ApiException("Unsupported value: '$value'");
+        return $value;
+    }
+
+    /**
+     * @param datetime $date
+     * @return string
+     */
+    protected static function formatDate($date)
+    {
+        if (is_string($date)) {
+            $date = strtotime($date);
+        }
+        return date('Ymd', $date);
     }
 
 }

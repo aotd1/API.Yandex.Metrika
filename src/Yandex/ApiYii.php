@@ -1,5 +1,4 @@
-<?php
-namespace Yandex;
+<?php namespace Yandex;
 
 class ApiYii extends \CApplicationComponent
 {

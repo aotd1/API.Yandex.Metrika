@@ -1,5 +1,4 @@
-<?php
-namespace Yandex;
+<?php namespace Yandex;
 
 class ApiException extends \Exception
 {
