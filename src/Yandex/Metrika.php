@@ -71,6 +71,24 @@ class Metrika extends ApiBase
     }
 
     /**
+     * @param string $name
+     * @param array $field additional fields
+     * @return array|null
+     * @throws ApiException
+     */
+    public function getCounterByName($name, array $field = array())
+    {
+        //@TODO cache getCounters command
+        $counters = $this->getCounters(null, null, null, $field);
+        foreach ($counters as $counter) {
+            if ($counter['name']===$name) {
+                return $counter;
+            }
+        }
+        return null;
+    }
+
+    /**
      * GET /counter/{id}/check
      * @param int $id
      * @return array

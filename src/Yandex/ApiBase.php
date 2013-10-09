@@ -30,7 +30,7 @@ class ApiBase
      * @throws ApiException on fail
      * @return array
      */
-    public function getTokenByCode($code)
+    public function getAccessTokenByCode($code)
     {
         $data = self::rawRequest('POST', 'https://oauth.yandex.ru/token', array(
             'grant_type' => 'authorization_code',

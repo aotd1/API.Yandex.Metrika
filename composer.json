@@ -1,0 +1,22 @@
+{
+    "name": "aotd/yandex",
+    "description": "Yandex API wrapper",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexey Ashurok",
+            "email": "work@aotd.ru"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "elkuku/console-table": "dev-master"
+    },
+    "require-dev": {
+        "elkuku/console-table" : "dev-master"
+    },
+    "autoload": {
+        "classmap": [ "src/" ]
+    },
+    "minimum-stability": "alpha"
+}
