@@ -2,7 +2,7 @@
 
 class Metrika extends ApiBase
 {
-    protected static $service = 'https://api-metrika.yandex.ru';
+    protected static $service = 'http://api-metrika.yandex.ru';
 
     public static $dictType = array('simple', 'partner');
     public static $dictPermission = array('own', 'view', 'edit');
@@ -147,6 +147,7 @@ class Metrika extends ApiBase
      * @param int $reverse Режим сортировки данных. Возможные значения: 
      *   1 ― по убыванию (используется по умолчанию); 
      *   0 ― по возрастанию.
+     * @return mixed
      * @link http://api.yandex.ru/metrika/doc/ref/stat/sources-search-engines.xml
      */
     public function statSearchEngines($id, $goalId = null, $dateFrom = null, $dateTo = null, $tableMode = "tree", $sort = "visits", $reverse = 1, $perPage = 100)

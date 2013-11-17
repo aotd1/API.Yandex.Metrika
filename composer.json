@@ -8,12 +8,9 @@
             "email": "work@aotd.ru"
         }
     ],
-    "require": {
+    "require-dev": {
         "php": ">=5.3.0",
         "elkuku/console-table": "dev-master"
-    },
-    "require-dev": {
-        "elkuku/console-table" : "dev-master"
     },
     "autoload": {
         "classmap": [ "src/" ]
