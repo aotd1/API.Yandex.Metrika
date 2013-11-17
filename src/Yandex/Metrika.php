@@ -144,9 +144,10 @@ class Metrika extends ApiBase
      * @param int $perPage Количество элементов на странице выдачи. По умолчанию выводится 100 записей.
      * @param string $sort Поле данных отчета, по которому необходимо отсортировать результаты запроса.
      *   Значение по умолчанию: visits — результаты запроса сортируются по количеству визитов.
-     * @param int $reverse Режим сортировки данных. Возможные значения: 
-     *   1 ― по убыванию (используется по умолчанию); 
+     * @param int $reverse Режим сортировки данных. Возможные значения:
+     *   1 ― по убыванию (используется по умолчанию);
      *   0 ― по возрастанию.
+     * @return mixed
      * @link http://api.yandex.ru/metrika/doc/ref/stat/sources-search-engines.xml
      */
     public function statSearchEngines($id, $goalId = null, $dateFrom = null, $dateTo = null, $tableMode = "tree", $sort = "visits", $reverse = 1, $perPage = 100)
